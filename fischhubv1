@@ -1,0 +1,655 @@
+-- Define the correct key
+local correctKey = "MYSECRETKEY"
+
+-- Create GUI elements
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local TextBox = Instance.new("TextBox")
+local VerifyButton = Instance.new("TextButton")
+local JoinDiscordButton = Instance.new("TextButton")
+local GetKeyButton = Instance.new("TextButton")
+local ErrorMessage = Instance.new("TextLabel")
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Frame setup
+Frame.Size = UDim2.new(0.4, 0, 0.3, 0)
+Frame.Position = UDim2.new(0.3, 0, 0.35, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BackgroundTransparency = 0.5
+Frame.Parent = ScreenGui
+
+-- TextLabel setup
+TextLabel.Text = "Key System"
+TextLabel.Size = UDim2.new(1, 0, 0.2, 0)
+TextLabel.Position = UDim2.new(0, 0, 0, 0)
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 24
+TextLabel.BackgroundTransparency = 1
+TextLabel.Parent = Frame
+
+-- TextBox setup
+TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+TextBox.PlaceholderText = "Enter your key"
+TextBox.ClearTextOnFocus = false
+TextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.Parent = Frame
+
+-- Error message setup
+ErrorMessage.Size = UDim2.new(1, 0, 0.2, 0)
+ErrorMessage.Position = UDim2.new(0, 0, 0.6, 0)
+ErrorMessage.Text = ""
+ErrorMessage.TextColor3 = Color3.fromRGB(255, 0, 0)
+ErrorMessage.TextSize = 18
+ErrorMessage.BackgroundTransparency = 1
+ErrorMessage.Parent = Frame
+
+-- Verify Button setup
+VerifyButton.Text = "Verify Key"
+VerifyButton.Size = UDim2.new(0.3, 0, 0.2, 0)
+VerifyButton.Position = UDim2.new(0.35, 0, 0.8, 0)
+VerifyButton.BackgroundColor3 = Color3.fromRGB(0, 128, 0)
+VerifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+VerifyButton.Parent = Frame
+
+-- Join Discord Button setup
+JoinDiscordButton.Text = "Join Discord"
+JoinDiscordButton.Size = UDim2.new(0.3, 0, 0.2, 0)
+JoinDiscordButton.Position = UDim2.new(0.05, 0, 0.8, 0)
+JoinDiscordButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+JoinDiscordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+JoinDiscordButton.Parent = Frame
+
+-- Get Key Button setup
+GetKeyButton.Text = "Get Key"
+GetKeyButton.Size = UDim2.new(0.3, 0, 0.2, 0)
+GetKeyButton.Position = UDim2.new(0.65, 0, 0.8, 0)
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+GetKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyButton.Parent = Frame
+
+-- Function to verify the key
+VerifyButton.MouseButton1Click:Connect(function()
+    local enteredKey = TextBox.Text
+    if enteredKey == correctKey then
+        -- Correct key, load the script
+        -- Fluent UI Setup
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Create Window
+local Window = Fluent:CreateWindow({
+    Title = "[🐟] Fisch",
+    SubTitle = "by Savi",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = false, -- Enable blur effect
+    Theme = "Dark", -- Choose Dark or Light Theme
+    MinimizeKey = Enum.KeyCode.K -- Used when theres no MinimizeKeybind
+})
+
+-- Add Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Items = Window:AddTab({ Title = "Items", Icon = "box" }),
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "map" }),
+    Misc = Window:AddTab({ Title = "Misc", Icon = "settings" })
+}
+
+-- Configuration variables
+local config = {
+    fpsCap = 9999,
+    disableChat = false,            -- Set to true to hide the chat
+    enableBigButton = true,        -- Set to true to enlarge the button in the shake UI
+    bigButtonScaleFactor = 2,      -- Scale factor for big button size
+    shakeSpeed = 0.05,             -- Lower value means faster shake (e.g., 0.05 for fast, 0.1 for normal)
+    FreezeWhileFishing = true      -- Set to true to freeze your character while fishing
+}
+
+-- Set FPS cap
+setfpscap(config.fpsCap)
+
+-- Services
+local players = game:GetService("Players")
+local vim = game:GetService("VirtualInputManager")
+local run_service = game:GetService("RunService")
+local replicated_storage = game:GetService("ReplicatedStorage")
+local localplayer = players.LocalPlayer
+local playergui = localplayer.PlayerGui
+local StarterGui = game:GetService("StarterGui")
+
+-- Disable chat if the option is enabled in config
+if config.disableChat then
+    StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+end
+
+-- Utility functions
+local utility = {blacklisted_attachments = {"bob", "bodyweld"}}; do
+    function utility.simulate_click(x, y, mb)
+        vim:SendMouseButtonEvent(x, y, (mb - 1), true, game, 1)
+        vim:SendMouseButtonEvent(x, y, (mb - 1), false, game, 1)
+    end
+
+    function utility.move_fix(bobber)
+        for index, value in bobber:GetDescendants() do
+            if (value.ClassName == "Attachment" and table.find(utility.blacklisted_attachments, value.Name)) then
+                value:Destroy()
+            end
+        end
+    end
+end
+
+local farm = {reel_tick = nil, cast_tick = nil}; do
+
+    function farm.find_rod()
+        local character = localplayer.Character
+        if not character then return nil end
+
+        for _, tool in ipairs(character:GetChildren()) do
+            if tool:IsA("Tool") and (tool.Name:find("rod") or tool.Name:find("Rod")) then
+                return tool
+            end
+        end
+        return nil
+    end
+
+    function farm.cast()
+        local character = localplayer.Character
+        if not character then return end
+
+        local rod = farm.find_rod()
+        if not rod then return end
+
+        -- Instantly cast without cooldown
+        local args = { [1] = 100, [2] = 1 }
+        rod.events.cast:FireServer(unpack(args))
+        farm.cast_tick = 0  -- Reset last cast time
+    end
+
+    function farm.shake()
+        local shake_ui = playergui:FindFirstChild("shakeui")
+        if shake_ui then
+            local safezone = shake_ui:FindFirstChild("safezone")
+            local button = safezone and safezone:FindFirstChild("button")
+
+            if button then
+                -- Apply big button option from config
+                if config.enableBigButton then
+                    button.Size = UDim2.new(config.bigButtonScaleFactor, 0, config.bigButtonScaleFactor, 0)
+                else
+                    button.Size = UDim2.new(1, 0, 1, 0)  -- Reset to default size if disabled
+                end
+
+                if button.Visible then
+                    utility.simulate_click(
+                        button.AbsolutePosition.X + button.AbsoluteSize.X / 2,
+                        button.AbsolutePosition.Y + button.AbsoluteSize.Y / 2,
+                        1
+                    )
+                end
+            end
+        end
+    end
+
+    function farm.reel()
+        local reel_ui = playergui:FindFirstChild("reel")
+        if not reel_ui then return end
+
+        local reel_bar = reel_ui:FindFirstChild("bar")
+        if not reel_bar then return end
+       
+        local reel_client = reel_bar:FindFirstChild("reel")
+        if not reel_client then return end
+
+        if reel_client.Disabled == true then
+            reel_client.Disabled = false
+        end
+
+        local update_colors = getsenv(reel_client).UpdateColors
+
+        -- Instant reel without waiting
+        if update_colors then
+            setupvalue(update_colors, 1, 100)
+            replicated_storage.events.reelfinished:FireServer(getupvalue(update_colors, 1), true)
+        end
+    end
+   
+end
+
+-- Initialize state variables for toggles
+local autoCastEnabled = false
+local autoShakeEnabled = false
+local autoReelEnabled = false
+local freezeCharacterEnabled = false
+
+-- Auto Cast Toggle
+local AutoCastToggle = Tabs.Main:AddToggle("AutoCast", {
+    Title = "Auto Cast",
+    Default = false
+})
+
+AutoCastToggle:OnChanged(function()
+    autoCastEnabled = AutoCastToggle.Value
+    print("Auto Cast toggled:", autoCastEnabled)
+end)
+
+-- Auto Shake Toggle
+local AutoShakeToggle = Tabs.Main:AddToggle("AutoShake", {
+    Title = "Auto Shake",
+    Default = false
+})
+
+AutoShakeToggle:OnChanged(function()
+    autoShakeEnabled = AutoShakeToggle.Value
+    print("Auto Shake toggled:", autoShakeEnabled)
+end)
+
+-- Auto Reel Toggle
+local AutoReelToggle = Tabs.Main:AddToggle("AutoReel", {
+    Title = "Auto Reel",
+    Default = false
+})
+
+AutoReelToggle:OnChanged(function()
+    autoReelEnabled = AutoReelToggle.Value
+    print("Auto Reel toggled:", autoReelEnabled)
+end)
+
+-- Freeze Character Function
+function farm.freeze_character(freeze)
+    local character = localplayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            if freeze then
+                humanoid.WalkSpeed = 0
+                humanoid.JumpPower = 0
+            else
+                humanoid.WalkSpeed = 16  -- Default WalkSpeed
+                humanoid.JumpPower = 50  -- Default JumpPower
+            end
+        end
+    end
+end
+
+-- Freeze Character Toggle
+local FreezeCharacterToggle = Tabs.Main:AddToggle("FreezeCharacter", {
+    Title = "Freeze Character",
+    Default = false
+})
+
+-- Variable to track freeze state
+local freezeCharacterEnabled = false
+
+FreezeCharacterToggle:OnChanged(function()
+    freezeCharacterEnabled = FreezeCharacterToggle.Value
+    print("Freeze Character toggled:", freezeCharacterEnabled)
+
+    -- Apply freeze state immediately based on toggle value
+    if freezeCharacterEnabled then
+        farm.freeze_character(true)
+    else
+        farm.freeze_character(false)
+    end
+end)
+
+-- Select first tab by default
+Window:SelectTab(1)
+
+-- Show the window
+Fluent:Notify({
+    Title = "Fluent UI",
+    Content = "The script has been successfully loaded.",
+    Duration = 5
+})
+
+-- Teleport Locations
+local locations = {
+    moosewood = Vector3.new(383, 134, 243),                     --1
+    roslit = Vector3.new(-1467, 132, 701),                      --2
+    terrapin = Vector3.new(-143, 145, 1909),                    --3
+    thedepths = Vector3.new(945, -711, 1238),                   --4
+    foresaken = Vector3.new(-2497, 136, 1627),                  --5
+    sunstone = Vector3.new(-935, 131, -1113),                   --6
+    snowcap = Vector3.new(2634, 142, 2514),                     --7
+    deep = Vector3.new(-1531, -234, -2866),                     --8
+    vertigo = Vector3.new(-106, -515, 1135),                    --9
+    keepers = Vector3.new(1298, -805, -273),                    --10
+    arch = Vector3.new(1010, 131, -1238),                       --11
+    mushgrove = Vector3.new(2573, 131, -759),                   --12
+    brinepool = Vector3.new(-1793, -143, -3323),                --13
+    volcano = Vector3.new(-1913, 164, 315),                     --14
+    deepshop = Vector3.new(-989, -244, -2720)                   --15
+}
+
+-- Teleport Dropdown
+local Dropdown = Tabs.Teleport:AddDropdown("Teleport Locations", {
+    Title = "Islands Teleport",
+    Values = {"moosewood", "roslit", "terrapin", "thedepths", "foresaken", "sunstone", "snowcap", "deep", "vertigo", "keepers", "arch", "mushgrove", "brinepool", "volcano", "deepshop"},
+    Multi = false,
+    Default = nil,
+})
+
+-- Teleport to selected location
+Dropdown:OnChanged(function(selected)
+    local location = locations[selected]
+    if location then
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(location)
+        end
+    end
+end)
+
+-- Add the toggle to the "Items" tab
+local ToggleAutoBuyBait = Tabs.Items:AddToggle("AutoBuyBaitToggle", {
+    Title = "Auto Buy Bait",
+    Default = false  -- Initially off
+})
+
+ToggleAutoBuyBait:OnChanged(function(state)
+    getgenv().BuyBaits = state
+
+    if state then
+        -- Start Auto Buy Bait when toggle is turned on
+        local function FireButton(x)
+            for i, v in pairs(getconnections(x.MouseButton1Click)) do
+                v.Function()
+            end
+        end
+
+        local function AutoBuyBaits()
+            while task.wait() do
+                if getgenv().BuyBaits then
+                    xpcall(function()
+                        local Over = game:GetService("Players").LocalPlayer.PlayerGui.over
+                        if Over:FindFirstChild("prompt") then
+                            local confirm = Over:FindFirstChild("prompt"):FindFirstChild("confirm")
+                            if confirm then
+                                FireButton(confirm)
+                            end
+                        else
+                            local interactables = workspace.world.interactables
+                            local Character = game.Players.LocalPlayer.Character
+                            local BaitCrate = interactables["Bait Crate"]
+
+                            Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(384, 137, 333)
+
+                            for _,baitcrate in pairs(BaitCrate:GetDescendants()) do
+                                if baitcrate.Name == "purchaserompt" then
+                                    fireproximityprompt(baitcrate)
+                                end
+                            end
+                        end
+                    end, function(err)
+                        warn("Error in BuyBaits: ", err)
+                    end)
+                end
+            end
+        end
+
+        task.spawn(AutoBuyBaits)
+    else
+        -- Stop Auto Buy Bait when toggle is turned off
+        getgenv().BuyBaits = false
+        print("Auto Buy Bait has been stopped.")
+    end
+end)
+
+-- You can use the following lines to control the toggle state
+-- To turn on the toggle programmatically, use:
+-- ToggleAutoBuyBait:SetValue(true)
+
+-- To turn off the toggle programmatically, use:
+-- ToggleAutoBuyBait:SetValue(false)
+
+-- Infinite Yield Button in Misc Tab
+Tabs.Misc:AddButton({
+    Title = "Infinite Yield",
+    Description = "Load Infinite Yield Script",
+    Callback = function()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        end)
+
+        if not success then
+            warn("Failed to load Infinite Yield: " .. err)
+        end
+    end
+})
+
+-- WalkSpeed Slider in Misc Tab
+Tabs.Misc:AddSlider("WalkSpeedSlider", {
+    Title = "WalkSpeed",
+    Min = 16,
+    Max = 300,
+    Default = 16,
+    Rounding = 1,
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = Value
+            end
+        end
+    end
+})
+
+-- JumpHeight Slider in Misc Tab
+Tabs.Misc:AddSlider("JumpHeightSlider", {
+    Title = "JumpHeight",
+    Min = 50,
+    Max = 500,
+    Default = 50,
+    Rounding = 1,
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+    end
+})
+
+-- Infinite Jump Toggle in Misc Tab
+local InfiniteJumpEnabled = false
+local InfiniteJumpConnection = nil
+local UserInputService = game:GetService("UserInputService")
+
+local ToggleInfiniteJump = Tabs.Misc:AddToggle("InfiniteJumpToggle", {
+    Title = "Infinite Jump",
+    Default = false,
+})
+
+ToggleInfiniteJump:OnChanged(function(state)
+    InfiniteJumpEnabled = state
+
+    -- Disconnect any previous JumpRequest connection to avoid multiple connections if the checkbox is toggled
+    if InfiniteJumpConnection then
+        InfiniteJumpConnection:Disconnect()
+    end
+
+    -- Create a new connection for the JumpRequest event
+    InfiniteJumpConnection = UserInputService.JumpRequest:Connect(function()
+        if InfiniteJumpEnabled then
+            local player = game.Players.LocalPlayer
+            local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end)
+end)
+
+-- Define the locations with their respective coordinates
+local locations = {
+    ["Bait Crate"] = Vector3.new(384, 137, 333),                     --1
+    ["Crab Cage"] = Vector3.new(475, 150, 233),                      --2
+    ["Coral Geode"] = Vector3.new(-1648, -213, -2850),               --3
+    ["TideBreaker"] = Vector3.new(-1640, -213, -2850),               --4
+    ["Glider"] = Vector3.new(-1640, -213, -2858),                    --5
+    ["Flippers"] = Vector3.new(-1638, -213, -2853),                  --6
+    ["Advanced Diving Gear"] = Vector3.new(-791, 142, -3102),        --7
+    ["Basic Diving Gear"] = Vector3.new(-1654, -214, -2825),         --8
+    ["Quality Bait Crate"] = Vector3.new(-175, 143, 1930),           --9
+    ["Super Flippers"] = Vector3.new(-971, -245, -2697)              --10
+}
+
+-- Function to teleport the player to the selected location
+local function teleportToLocation(locationName)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local targetPosition = locations[locationName]
+        if targetPosition then
+            character.HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+            print("Teleported to:", locationName)
+        else
+            warn("Location not found: " .. locationName)
+        end
+    end
+end
+
+-- Teleport Dropdown
+local Dropdown = Tabs.Teleport:AddDropdown("Teleport Locations", {
+    Title = "Items Teleport",
+    Values = {"Bait Crate", "Crab Cage", "Coral Geode", "TideBreaker", "Glider", 
+     "Flippers", "Advanced Diving Gear", "Basic Diving Gear", 
+     "Quality Bait Crate", "Super Flippers"},
+    Multi = false,
+    Default = nil,
+})
+
+-- Teleport to selected location
+Dropdown:OnChanged(function(selected)
+    local location = locations[selected]
+    if location then
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(location)
+        end
+    end
+end)
+
+--rods coords
+local locations = {
+    ["Filmsy rod"] = Vector3.new(469, 151, 233),                     --1
+    ["Training rod"] = Vector3.new(460, 151, 233),                   --2
+    ["Plastic rod"] = Vector3.new(451, 151, 231),                    --3
+    ["Carbon rod"] = Vector3.new(451, 151, 224),                     --4
+    ["Fast rod"] = Vector3.new(450, 151, 221),                       --5
+    ["Lucky rod"] = Vector3.new(444, 151, 225),                      --6
+    ["Rapid rod"] = Vector3.new(-1507, 142, 762),                    --7
+    ["Steady rod"] = Vector3.new(-1515, 142, 761),                   --8
+    ["Fortune rod"] = Vector3.new(-1524, 141, 770),                  --9
+    ["Magnet rod"] = Vector3.new(-199, 133, 1929),                   --10
+    ["Trident rod"] = Vector3.new(-1482, -226, -2204),               --11
+    ["Scurvy rod"] = Vector3.new(-2821, 214, 1513),                  --12
+    ["Nocturnal rod"] = Vector3.new(-143, -515, 1143),               --13
+    ["Aurora rod"] = Vector3.new(-145, -515, 1132),                  --14
+    ["Kings rod"] = Vector3.new(1381, -807, -302),                   --15
+    ["Reinforced rod"] = Vector3.new(-991, -244, -2694)              --16
+}
+
+-- Teleport Dropdown
+local Dropdown = Tabs.Teleport:AddDropdown("Teleport Locations", {
+    Title = "Rods Teleport",
+    Values = {"Filmsy rod", "Training rod", "Plastic rod", "Carbon rod", "Fast rod", 
+     "Lucky rod", "Rapid rod", "Steady rod", "Fortune rod", "Magnet rod", 
+     "Trident rod", "Scurvy rod", "Nocturnal rod", "Aurora rod", "Kings rod", 
+     "Reinforced rod"},
+    Multi = false,
+    Default = nil,
+})
+
+-- Teleport to selected location
+Dropdown:OnChanged(function(selected)
+    local location = locations[selected]
+    if location then
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(location)
+        end
+    end
+end)
+
+local locations = {
+    ["Merchant"] = Vector3.new(465, 151, 229),                     --1
+    ["Appraiser"] = Vector3.new(448, 151, 207),                    --2
+    ["Angler"] = Vector3.new(-188, 136, 1964),                     --3
+    ["Map fixer"] = Vector3.new(-2827, 215, 1521),                 --4
+    ["Merlin"] = Vector3.new(-933, 224, -987),                     --5
+    ["Wilson"] = Vector3.new(2938, 281, 2573),                     --6
+    ["Enchant"] = Vector3.new(1311, -805, -100),                    --7
+    ["Caleia"] = Vector3.new(984, 131, -1233),                     --8
+}
+
+-- Teleport Dropdown
+local Dropdown = Tabs.Teleport:AddDropdown("Teleport Locations", {
+    Title = "NPC Teleport",
+    Values = {"Merchant", "Appraiser", "Angler", "Map fixer", "Merlin", 
+     "Wilson", "Enchant", "Caleia"},
+    Multi = false,
+    Default = nil,
+})
+
+-- Teleport to selected location
+Dropdown:OnChanged(function(selected)
+    local location = locations[selected]
+    if location then
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(location)
+        end
+    end
+end)
+
+local locations = {
+    ["Aurora totem"] = Vector3.new(-1810, -137, -3283),               --1
+    ["Sundial totem"] = Vector3.new(-1146, 134, -1072),               --2
+    ["Tempest totem"] = Vector3.new(-37, 132, 1945),                  --3
+    ["Windset totem"] = Vector3.new(2850, 180, 2700),                 --4
+    ["Smokescreen totem"] = Vector3.new(2790, 140, -630),            --5
+}
+
+-- Teleport Dropdown
+local Dropdown = Tabs.Teleport:AddDropdown("Teleport Locations", {
+    Title = "Totem Teleport",
+    Values = {"Aurora totem", "Sundial totem", "Tempest totem", "Windset totem", 
+     "Smokescreen totem"},
+    Multi = false,
+    Default = nil,
+})
+
+-- Teleport to selected location
+Dropdown:OnChanged(function(selected)
+    local location = locations[selected]
+    if location then
+        local player = game.Players.LocalPlayer
+        if player and player.Character then
+            player.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(location)
+        end
+    end
+end)
+        Frame:Destroy()  -- Close the key system GUI
+    else
+        -- Incorrect key, show error
+        TextBox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        ErrorMessage.Text = "Incorrect Key"
+    end
+end)
+
+-- Function to copy the Discord invite link
+JoinDiscordButton.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/QeRT8Jse")
+    ErrorMessage.Text = "Discord link copied!"
+end)
+
+-- Function to copy the key URL
+GetKeyButton.MouseButton1Click:Connect(function()
+    setclipboard("https://link-center.net/1258453/fisch-script-hub-key")
+    ErrorMessage.Text = "Key URL copied!"
+end)
